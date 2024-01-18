@@ -6,12 +6,16 @@ package frc.robot;
 
 import frc.robot.commands.Autos;
 import frc.robot.commands.DriveTrainCommand;
-import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.PullNote;
+import frc.robot.commands.PushNote;
+import frc.robot.commands.StopIntake;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.Intake;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -24,6 +28,8 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private DriveTrain driveTrain = new DriveTrain();
+  private Intake intake = new Intake();
+  private JoystickButton buttonA, buttonB;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private XboxController driverController, driverPartnerController;
@@ -32,6 +38,9 @@ public class RobotContainer {
   public RobotContainer() {
     driverController = new XboxController(Constants.OperatorConstants.kDriverControllerPort);
     driverPartnerController = new XboxController(Constants.OperatorConstants.kDriverPartnerControllerPort);
+
+    this.buttonA = new JoystickButton(driverController, Constants.Button.kA);
+    this.buttonB = new JoystickButton(driverController, Constants.Button.kB);
 
 
     driveTrain.setDefaultCommand(new DriveTrainCommand(driveTrain, driverController));
@@ -49,9 +58,8 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    new Trigger(m_exampleSubsystem::exampleCondition)
-        .onTrue(new ExampleCommand(m_exampleSubsystem));
+    buttonA.onTrue(new PullNote(intake)).onFalse(new StopIntake(intake));
+    buttonB.onTrue(new PushNote(intake)).onFalse(new StopIntake(intake));
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.

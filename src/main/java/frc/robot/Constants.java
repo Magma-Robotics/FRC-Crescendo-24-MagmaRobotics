@@ -17,4 +17,9 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
     public static final int kDriverPartnerControllerPort = 1;
   }
+
+  public static class Button {
+    public static final int kA = 1;
+    public static final int kB = 2;
+  }
 }
