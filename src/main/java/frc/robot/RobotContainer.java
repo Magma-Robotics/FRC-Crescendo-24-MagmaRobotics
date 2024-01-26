@@ -12,7 +12,14 @@ import frc.robot.commands.StopIntake;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Intake;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -30,20 +37,34 @@ public class RobotContainer {
   private DriveTrain driveTrain = new DriveTrain();
   private Intake intake = new Intake();
   private JoystickButton buttonA, buttonB;
+  private final SendableChooser<Command> autoChooser;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private XboxController driverController, driverPartnerController;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    //Register named commands
+    NamedCommands.registerCommand("pullNote", new PullNote(intake));
+    NamedCommands.registerCommand("stopIntake", new StopIntake(intake));
+
+    //controllers
     driverController = new XboxController(Constants.OperatorConstants.kDriverControllerPort);
     driverPartnerController = new XboxController(Constants.OperatorConstants.kDriverPartnerControllerPort);
 
+
+    //buttons
     this.buttonA = new JoystickButton(driverController, Constants.Button.kA);
     this.buttonB = new JoystickButton(driverController, Constants.Button.kB);
 
 
+    //default commands
     driveTrain.setDefaultCommand(new DriveTrainCommand(driveTrain, driverController));
+
+    //autoChooser for pathplanner
+    autoChooser = AutoBuilder.buildAutoChooser();
+
+    SmartDashboard.putData("Auto Chooser", autoChooser);
     // Configure the trigger bindings
     configureBindings();
   }
@@ -72,6 +93,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return Autos.exampleAuto(m_exampleSubsystem);
+    return autoChooser.getSelected();
   }
 }
