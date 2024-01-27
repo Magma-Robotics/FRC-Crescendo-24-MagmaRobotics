@@ -17,19 +17,22 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveTrain extends SubsystemBase{
+    private NavX navx;
 
     private CANSparkMax leftFront = new CANSparkMax(1, MotorType.kBrushless);
     private CANSparkMax leftBack = new CANSparkMax(2, MotorType.kBrushless);
     private CANSparkMax rightFront = new CANSparkMax(3, MotorType.kBrushless);
     private CANSparkMax rightBack = new CANSparkMax(4, MotorType.kBrushless);
-
-    private DifferentialDrive diffDrive;
-    private NavX navx;
+    private final DifferentialDrive diffDrive = new DifferentialDrive(leftFront, rightFront);
 
     public DriveTrain() {
         leftBack.follow(leftFront, true);
         rightBack.follow(rightFront, true);
-        diffDrive = new DifferentialDrive(leftFront, rightFront);
+
+        leftFront.burnFlash();
+        leftBack.burnFlash();
+        rightFront.burnFlash();
+        rightBack.burnFlash();
 
         final AutoBuilder autoBuilder = new AutoBuilder().configureRamsete(
             m_PoseEstimator.getEstimatedPosition(), //Robot pose supplier
@@ -57,8 +60,9 @@ public class DriveTrain extends SubsystemBase{
         diffDrive.tankDrive(-leftJoystick, rightJoystick);
     }
 
+    
     private final DifferentialDriveKinematics m_kinematics = 
-        new DifferentialDriveKinematics(0/*track width in meters*/);
+        new DifferentialDriveKinematics(0);
 
 
     private DifferentialDriveWheelSpeeds wheelSpeeds = new DifferentialDriveWheelSpeeds(0.0, 0.0);
@@ -67,7 +71,7 @@ public class DriveTrain extends SubsystemBase{
 
     private final DifferentialDrivePoseEstimator m_PoseEstimator =
         new DifferentialDrivePoseEstimator(
-            m_kinematics, 
+            m_kinematics, //track width
             navx.getRotation2d(),
             0, //encoders
             0, 
@@ -78,5 +82,6 @@ public class DriveTrain extends SubsystemBase{
         navx.resetYaw();
         m_PoseEstimator.resetPosition(navx.getRotation2d(), wheelPositions, null);
     }
+    
 
 }
