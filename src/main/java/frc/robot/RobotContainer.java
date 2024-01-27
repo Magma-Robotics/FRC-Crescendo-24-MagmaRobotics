@@ -8,10 +8,14 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.DriveTrainCommand;
 import frc.robot.commands.PullNote;
 import frc.robot.commands.PushNote;
+import frc.robot.commands.ReverseShootNote;
+import frc.robot.commands.ShootNote;
 import frc.robot.commands.StopIntake;
+import frc.robot.commands.StopShooter;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -36,7 +40,8 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private DriveTrain driveTrain = new DriveTrain();
   private Intake intake = new Intake();
-  private JoystickButton buttonA, buttonB;
+  private Shooter shooter = new Shooter();
+  private JoystickButton buttonA, buttonB, buttonX, buttonY;
   private final SendableChooser<Command> autoChooser;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -44,9 +49,9 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    //Register named commands
+    /*//Register named commands
     NamedCommands.registerCommand("pullNote", new PullNote(intake));
-    NamedCommands.registerCommand("stopIntake", new StopIntake(intake));
+    NamedCommands.registerCommand("stopIntake", new StopIntake(intake));*/
 
     //controllers
     driverController = new XboxController(Constants.OperatorConstants.kDriverControllerPort);
@@ -56,6 +61,8 @@ public class RobotContainer {
     //buttons
     this.buttonA = new JoystickButton(driverController, Constants.Button.kA);
     this.buttonB = new JoystickButton(driverController, Constants.Button.kB);
+    this.buttonX = new JoystickButton(driverController, Constants.Button.kX);
+    this.buttonY = new JoystickButton(driverController, Constants.Button.kY);
 
 
     //default commands
@@ -81,6 +88,8 @@ public class RobotContainer {
   private void configureBindings() {
     buttonA.onTrue(new PullNote(intake)).onFalse(new StopIntake(intake));
     buttonB.onTrue(new PushNote(intake)).onFalse(new StopIntake(intake));
+    buttonX.onTrue(new ShootNote(shooter)).onFalse(new StopShooter(shooter));
+    buttonY.onTrue(new ReverseShootNote(shooter)).onFalse(new StopShooter(shooter));
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
