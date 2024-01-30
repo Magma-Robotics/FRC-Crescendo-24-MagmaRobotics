@@ -36,13 +36,13 @@ public class DriveTrain extends SubsystemBase{
         rightFront.burnFlash();
         rightBack.burnFlash();
 
-        final AutoBuilder autoBuilder = new AutoBuilder().configureRamsete(
+        AutoBuilder.configureRamsete(
             this::getPose, //Robot pose supplier
             this::resetPose, //resets odometry
-            this::getSpeeds, //wheelspeed supplier
+            this::getSpeeds, //chassisspeeds supplier
             (chassisSpeeds) -> {
-                DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(chassisSpeeds)
-                diffDrive.tankDrive(wheelSpeeds.leftMetersPerSecond, wheelSpeeds.rightMetersPerSecond)
+                DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(chassisSpeeds);
+                diffDrive.tankDrive(wheelSpeeds.leftMetersPerSecond, wheelSpeeds.rightMetersPerSecond);
             }, //drives robot
             new ReplanningConfig(), // default path replanning config
             () -> {
