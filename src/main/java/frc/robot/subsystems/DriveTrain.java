@@ -8,12 +8,14 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelPositions;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive.WheelSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveTrain extends SubsystemBase{
@@ -35,10 +37,13 @@ public class DriveTrain extends SubsystemBase{
         rightBack.burnFlash();
 
         final AutoBuilder autoBuilder = new AutoBuilder().configureRamsete(
-            m_PoseEstimator.getEstimatedPosition(), //Robot pose supplier
-            resetPose(), //resets odometry
-            wheelSpeeds, //wheelspeed supplier
-            diffDrive, //drives robot
+            this::getPose, //Robot pose supplier
+            this::resetPose, //resets odometry
+            this::getSpeeds, //wheelspeed supplier
+            (chassisSpeeds) -> {
+                DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(chassisSpeeds)
+                diffDrive.tankDrive(wheelSpeeds.leftMetersPerSecond, wheelSpeeds.rightMetersPerSecond)
+            }, //drives robot
             new ReplanningConfig(), // default path replanning config
             () -> {
                 var alliance = DriverStation.getAlliance();
@@ -60,28 +65,39 @@ public class DriveTrain extends SubsystemBase{
         diffDrive.tankDrive(-leftJoystick, rightJoystick);
     }
 
+    public Pose2d getPose() {
+        return m_PoseEstimator.getEstimatedPosition();
+    }
+
+    public void resetPose(Pose2d pose) {
+        m_PoseEstimator.resetPosition(navx.getRotation2d(), wheelPositions, pose);
+    }
+
+    public ChassisSpeeds getSpeeds() {
+        return chassisSpeeds;
+    }
+
+    public Rotation2d getRotation2d() {
+        return navx.getRotation2d();
+    }
+
     
     private final DifferentialDriveKinematics m_kinematics = 
         new DifferentialDriveKinematics(0);
 
-
     private DifferentialDriveWheelSpeeds wheelSpeeds = new DifferentialDriveWheelSpeeds(0.0, 0.0);
+
+    private ChassisSpeeds chassisSpeeds = m_kinematics.toChassisSpeeds(wheelSpeeds);
 
     private DifferentialDriveWheelPositions wheelPositions = new DifferentialDriveWheelPositions(null, null);
 
     private final DifferentialDrivePoseEstimator m_PoseEstimator =
         new DifferentialDrivePoseEstimator(
             m_kinematics, //track width
-            navx.getRotation2d(),
+            getRotation2d(),
             0, //encoders
             0, 
             new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
-
-
-    public void resetPose() {
-        navx.resetYaw();
-        m_PoseEstimator.resetPosition(navx.getRotation2d(), wheelPositions, null);
-    }
     
 
 }
