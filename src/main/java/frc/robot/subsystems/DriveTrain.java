@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
@@ -13,9 +14,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelPositions;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive.WheelSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveTrain extends SubsystemBase{
@@ -27,7 +26,15 @@ public class DriveTrain extends SubsystemBase{
     private CANSparkMax rightBack = new CANSparkMax(4, MotorType.kBrushless);
     private final DifferentialDrive diffDrive = new DifferentialDrive(leftFront, rightFront);
 
+    private RelativeEncoder leftFrontEncoder = leftFront.getEncoder();
+    private RelativeEncoder rightFrontEncoder = rightFront.getEncoder();
+    private RelativeEncoder leftBackEncoder = leftBack.getEncoder();
+    private RelativeEncoder rightBackEncoder = rightBack.getEncoder();
+
     public DriveTrain() {
+        leftFront.setInverted(false);
+        rightFront.setInverted(false);
+
         leftBack.follow(leftFront, true);
         rightBack.follow(rightFront, true);
 
@@ -70,7 +77,7 @@ public class DriveTrain extends SubsystemBase{
     }
 
     public void resetPose(Pose2d pose) {
-        m_PoseEstimator.resetPosition(navx.getRotation2d(), wheelPositions, pose);
+        m_PoseEstimator.resetPosition(getRotation2d(), wheelPositions, pose);
     }
 
     public ChassisSpeeds getSpeeds() {
@@ -83,13 +90,13 @@ public class DriveTrain extends SubsystemBase{
 
     
     private final DifferentialDriveKinematics m_kinematics = 
-        new DifferentialDriveKinematics(0);
+        new DifferentialDriveKinematics(22.5/39.37); //22.5 in to meters
 
     private DifferentialDriveWheelSpeeds wheelSpeeds = new DifferentialDriveWheelSpeeds(0.0, 0.0);
 
     private ChassisSpeeds chassisSpeeds = m_kinematics.toChassisSpeeds(wheelSpeeds);
 
-    private DifferentialDriveWheelPositions wheelPositions = new DifferentialDriveWheelPositions(null, null);
+    private DifferentialDriveWheelPositions wheelPositions = new DifferentialDriveWheelPositions(0, );
 
     private final DifferentialDrivePoseEstimator m_PoseEstimator =
         new DifferentialDrivePoseEstimator(
