@@ -48,9 +48,9 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    /*//Register named commands
+    //Register named commands
     NamedCommands.registerCommand("pullNote", new PullNote(intake));
-    NamedCommands.registerCommand("stopIntake", new StopIntake(intake));*/
+    NamedCommands.registerCommand("stopIntake", new StopIntake(intake));
 
     //controllers
     driverController = new XboxController(Constants.OperatorConstants.kDriverControllerPort);

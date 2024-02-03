@@ -16,6 +16,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class DriveTrain extends SubsystemBase{
     private NavX navx;
@@ -26,10 +27,11 @@ public class DriveTrain extends SubsystemBase{
     private CANSparkMax rightBack = new CANSparkMax(4, MotorType.kBrushless);
     private final DifferentialDrive diffDrive = new DifferentialDrive(leftFront, rightFront);
 
-    private RelativeEncoder leftFrontEncoder = leftFront.getEncoder();
-    private RelativeEncoder rightFrontEncoder = rightFront.getEncoder();
-    private RelativeEncoder leftBackEncoder = leftBack.getEncoder();
-    private RelativeEncoder rightBackEncoder = rightBack.getEncoder();
+    private RelativeEncoder leftEncoder = leftFront.getEncoder();
+    private RelativeEncoder rightEncoder = rightFront.getEncoder();
+
+    private final double wheelDiameter = Constants.Drivetrain.WHEEL_DIAMETER_IN_METERS;
+    private final double trackWidth = Constants.Drivetrain.TRACK_WIDTH_IN_METERS;
 
     public DriveTrain() {
         leftFront.setInverted(false);
@@ -38,10 +40,17 @@ public class DriveTrain extends SubsystemBase{
         leftBack.follow(leftFront, true);
         rightBack.follow(rightFront, true);
 
+        leftEncoder.setPositionConversionFactor((wheelDiameter * Math.PI) / (8.46));
+        rightEncoder.setPositionConversionFactor((wheelDiameter * Math.PI) / (8.46));
+
+        leftEncoder.setVelocityConversionFactor((wheelDiameter * Math.PI) / (8.46 * 60));
+        rightEncoder.setVelocityConversionFactor((wheelDiameter * Math.PI) / (8.46 * 60));
+
         leftFront.burnFlash();
         leftBack.burnFlash();
         rightFront.burnFlash();
         rightBack.burnFlash();
+        
 
         AutoBuilder.configureRamsete(
             this::getPose, //Robot pose supplier
@@ -79,32 +88,29 @@ public class DriveTrain extends SubsystemBase{
     public void resetPose(Pose2d pose) {
         m_PoseEstimator.resetPosition(getRotation2d(), wheelPositions, pose);
     }
-
-    public ChassisSpeeds getSpeeds() {
-        return chassisSpeeds;
-    }
-
-    public Rotation2d getRotation2d() {
-        return navx.getRotation2d();
-    }
-
     
+    private DifferentialDriveWheelPositions wheelPositions = new DifferentialDriveWheelPositions(leftEncoder.getPosition(), rightEncoder.getPosition()); //encoder ticks in meters
+   
     private final DifferentialDriveKinematics m_kinematics = 
-        new DifferentialDriveKinematics(22.5/39.37); //22.5 in to meters
-
-    private DifferentialDriveWheelSpeeds wheelSpeeds = new DifferentialDriveWheelSpeeds(0.0, 0.0);
-
-    private ChassisSpeeds chassisSpeeds = m_kinematics.toChassisSpeeds(wheelSpeeds);
-
-    private DifferentialDriveWheelPositions wheelPositions = new DifferentialDriveWheelPositions(0, );
-
+        new DifferentialDriveKinematics(trackWidth); //track width
+    
     private final DifferentialDrivePoseEstimator m_PoseEstimator =
         new DifferentialDrivePoseEstimator(
             m_kinematics, //track width
             getRotation2d(),
-            0, //encoders
-            0, 
+            wheelPositions.leftMeters, //encoders
+            wheelPositions.rightMeters, 
             new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
-    
 
+    public ChassisSpeeds getSpeeds() {
+        return chassisSpeeds;
+    }
+    
+    private DifferentialDriveWheelSpeeds wheelSpeeds = new DifferentialDriveWheelSpeeds(leftEncoder.getVelocity(), rightEncoder.getVelocity()); //rpm in m/s
+
+    private ChassisSpeeds chassisSpeeds = m_kinematics.toChassisSpeeds(wheelSpeeds);
+
+    public Rotation2d getRotation2d() {
+        return navx.getRotation2d();
+    }
 }
