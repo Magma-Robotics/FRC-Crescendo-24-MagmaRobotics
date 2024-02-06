@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import frc.robot.commands.AutoShootNote;
 import frc.robot.commands.Autos;
 import frc.robot.commands.DriveTrainCommand;
 import frc.robot.commands.PullNote;
@@ -17,10 +18,14 @@ import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -49,8 +54,9 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     //Register named commands
-    NamedCommands.registerCommand("pullNote", new PullNote(intake));
-    NamedCommands.registerCommand("stopIntake", new StopIntake(intake));
+    List<Pair<String, Command>> namedCommands = new ArrayList<Pair<String, Command>>();
+    namedCommands.add(new Pair<String,Command>("autoShootNote", new AutoShootNote(shooter)));
+    NamedCommands.registerCommands(namedCommands);
 
     //controllers
     driverController = new XboxController(Constants.OperatorConstants.kDriverControllerPort);

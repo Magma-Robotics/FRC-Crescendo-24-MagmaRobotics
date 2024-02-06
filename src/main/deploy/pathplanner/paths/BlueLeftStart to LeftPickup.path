@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.2420819149865,
-        "y": 6.9697030260925565
+        "x": 1.171904793952038,
+        "y": 7.063269283233724
       },
       "isLocked": false,
       "linkedName": null
@@ -42,7 +42,7 @@
     "rotation": 0,
     "rotateFast": false
   },
-  "reversed": true,
+  "reversed": false,
   "folder": "BlueLeftAuto",
   "previewStartingState": null,
   "useDefaultConstraints": false

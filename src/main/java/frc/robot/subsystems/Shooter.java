@@ -24,5 +24,8 @@ public class Shooter extends SubsystemBase{
         rightShooterMotor.set(1);
     }
 
+    public void autoShootNote() {
+        
+    }
 
 }

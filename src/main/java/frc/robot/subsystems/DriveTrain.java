@@ -39,7 +39,8 @@ public class DriveTrain extends SubsystemBase{
 
         leftBack.follow(leftFront, true);
         rightBack.follow(rightFront, true);
-
+        
+        //records encoders in terms of meters, 8.46:1 gear ratio
         leftEncoder.setPositionConversionFactor((wheelDiameter * Math.PI) / (8.46));
         rightEncoder.setPositionConversionFactor((wheelDiameter * Math.PI) / (8.46));
 

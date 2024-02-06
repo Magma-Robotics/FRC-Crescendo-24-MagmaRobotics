@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -12,9 +13,9 @@ public class NavX extends SubsystemBase {
 
     public NavX() {
         try {
-            this.navx = new AHRS(SerialPort.Port.kUSB1);
+            this.navx = new AHRS(SerialPort.Port.kUSB);
         } catch (Exception e) {
-            System.out.println("NavX not connected.");
+            DriverStation.reportError("Error instantiating navX-MXP:  " + e.getMessage(), true);
         }
     }
 
