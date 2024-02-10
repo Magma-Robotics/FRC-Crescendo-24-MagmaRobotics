@@ -1,11 +1,13 @@
 package frc.robot.subsystems;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.LTVDifferentialDriveController;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,6 +17,8 @@ import edu.wpi.first.math.kinematics.DifferentialDriveWheelPositions;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -33,12 +37,14 @@ public class DriveTrain extends SubsystemBase{
     private final double wheelDiameter = Constants.Drivetrain.WHEEL_DIAMETER_IN_METERS;
     private final double trackWidth = Constants.Drivetrain.TRACK_WIDTH_IN_METERS;
 
+    private Field2d field = new Field2d();
+
     public DriveTrain() {
         leftFront.setInverted(false);
         rightFront.setInverted(false);
 
-        leftBack.follow(leftFront, true);
-        rightBack.follow(rightFront, true);
+        leftBack.follow(leftFront);
+        rightBack.follow(rightFront);
         
         //records encoders in terms of meters, 8.46:1 gear ratio
         leftEncoder.setPositionConversionFactor((wheelDiameter * Math.PI) / (8.46));
@@ -71,8 +77,33 @@ public class DriveTrain extends SubsystemBase{
             }, //if path is mirrored or not
             this // reference to this subsystem to set requirements
             );
-        
+
+        AutoBuilder.configureLTV(
+            this::getPose, 
+            this::resetPose, 
+            this::getSpeeds, 
+            (chassisSpeeds) -> {
+                    DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(chassisSpeeds);
+                    diffDrive.tankDrive(wheelSpeeds.leftMetersPerSecond, wheelSpeeds.rightMetersPerSecond);
+                }, 
+            0.02, 
+            new ReplanningConfig(), 
+            () -> {
+                    var alliance = DriverStation.getAlliance();
+                    if (alliance.isPresent()) {
+                        return alliance.get() == DriverStation.Alliance.Red;
+                    }
+                    return false;
+                }, 
+            this);
+
+        // Set up custom logging to add the current path to a field 2d widget
+        PathPlannerLogging.setLogActivePathCallback((poses) -> field.getObject("path").setPoses(poses));
+
+        SmartDashboard.putData("Field", field);
     }
+
+    public LTVDifferentialDriveController ltvController = new LTVDifferentialDriveController(null, trackWidth, null, null, trackWidth);
 
     public void stop() {
         diffDrive.stopMotor();
