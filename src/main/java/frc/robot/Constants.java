@@ -30,5 +30,17 @@ public final class Constants {
   public static class Drivetrain {
     public static final double WHEEL_DIAMETER_IN_METERS = Units.inchesToMeters(6);
     public static final double TRACK_WIDTH_IN_METERS = Units.inchesToMeters(22.5);
+
+    public static class LeftWheels {
+      public static final double kP = 0;
+      public static final double kI = 0;
+      public static final double kD = 0;
+    }
+
+    public static class RightWheels {
+      public static final double kP = 0;
+      public static final double kI = 0;
+      public static final double kD = 0;
+    }
   }
 }

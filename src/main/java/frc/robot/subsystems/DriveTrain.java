@@ -8,6 +8,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.LTVDifferentialDriveController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -37,6 +38,9 @@ public class DriveTrain extends SubsystemBase{
     private final double wheelDiameter = Constants.Drivetrain.WHEEL_DIAMETER_IN_METERS;
     private final double trackWidth = Constants.Drivetrain.TRACK_WIDTH_IN_METERS;
 
+    private PIDController leftWheelsController = new PIDController(Constants.Drivetrain.LeftWheels.kP, Constants.Drivetrain.LeftWheels.kI, Constants.Drivetrain.LeftWheels.kD); 
+    private PIDController rightWheelsController = new PIDController(Constants.Drivetrain.RightWheels.kP, Constants.Drivetrain.RightWheels.kI, Constants.Drivetrain.RightWheels.kD);
+
     private Field2d field = new Field2d();
 
     public DriveTrain() {
@@ -65,7 +69,8 @@ public class DriveTrain extends SubsystemBase{
             this::getSpeeds, //chassisspeeds supplier
             (chassisSpeeds) -> {
                 DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(chassisSpeeds);
-                diffDrive.tankDrive(wheelSpeeds.leftMetersPerSecond, wheelSpeeds.rightMetersPerSecond);
+                diffDrive.tankDrive(leftWheelsController.calculate(leftEncoder.getVelocity(), wheelSpeeds.leftMetersPerSecond), 
+                    rightWheelsController.calculate(rightEncoder.getVelocity(), wheelSpeeds.rightMetersPerSecond));
             }, //drives robot
             new ReplanningConfig(), // default path replanning config
             () -> {
@@ -83,8 +88,9 @@ public class DriveTrain extends SubsystemBase{
             this::resetPose, 
             this::getSpeeds, 
             (chassisSpeeds) -> {
-                    DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(chassisSpeeds);
-                    diffDrive.tankDrive(wheelSpeeds.leftMetersPerSecond, wheelSpeeds.rightMetersPerSecond);
+                DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(chassisSpeeds);
+                diffDrive.tankDrive(leftWheelsController.calculate(leftEncoder.getVelocity(), wheelSpeeds.leftMetersPerSecond), 
+                    rightWheelsController.calculate(rightEncoder.getVelocity(), wheelSpeeds.rightMetersPerSecond));
                 }, 
             0.02, 
             new ReplanningConfig(), 
@@ -103,7 +109,7 @@ public class DriveTrain extends SubsystemBase{
         SmartDashboard.putData("Field", field);
     }
 
-    public LTVDifferentialDriveController ltvController = new LTVDifferentialDriveController(null, trackWidth, null, null, trackWidth);
+    //public LTVDifferentialDriveController ltvController = new LTVDifferentialDriveController(null, trackWidth, null, null, trackWidth);
 
     public void stop() {
         diffDrive.stopMotor();
