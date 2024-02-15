@@ -1,14 +1,14 @@
-package frc.robot.commands;
+package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Intake;
 
-public class ReverseShootNote extends Command{
-    private final Shooter shooter;
-
-    public ReverseShootNote(Shooter shooter){
-        this.shooter = shooter;
-        addRequirements(shooter);
+public class PushNote extends Command {
+    private final Intake intake;
+    
+    public PushNote(Intake intake){
+        this.intake = intake;
+        addRequirements(intake);
     }
     
     @Override
@@ -17,7 +17,7 @@ public class ReverseShootNote extends Command{
 
     @Override
     public void execute() {
-        shooter.reverseShootNote();
+       intake.pushNote();
     }
 
     @Override
@@ -29,5 +29,4 @@ public class ReverseShootNote extends Command{
     public boolean isFinished() {
         return false;
     }
-    
 }

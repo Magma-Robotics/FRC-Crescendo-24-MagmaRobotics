@@ -4,15 +4,15 @@
 
 package frc.robot;
 
-import frc.robot.commands.AutoShootNote;
 import frc.robot.commands.Autos;
-import frc.robot.commands.DriveTrainCommand;
-import frc.robot.commands.PullNote;
-import frc.robot.commands.PushNote;
-import frc.robot.commands.ReverseShootNote;
-import frc.robot.commands.ShootNote;
-import frc.robot.commands.StopIntake;
-import frc.robot.commands.StopShooter;
+import frc.robot.commands.drive.DriveTrainCommand;
+import frc.robot.commands.intake.PullNote;
+import frc.robot.commands.intake.PushNote;
+import frc.robot.commands.intake.StopIntake;
+import frc.robot.commands.shooter.AutoShootNote;
+import frc.robot.commands.shooter.ReverseShootNote;
+import frc.robot.commands.shooter.ShootNote;
+import frc.robot.commands.shooter.StopShooter;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Intake;

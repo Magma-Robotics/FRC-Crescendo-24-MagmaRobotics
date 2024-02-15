@@ -1,12 +1,12 @@
-package frc.robot.commands;
+package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake;
 
-public class PullNote extends Command {
-    private final Intake intake;
+public class StopIntake extends Command {
+     private final Intake intake;
     
-    public PullNote(Intake intake){
+    public StopIntake(Intake intake){
         this.intake = intake;
         addRequirements(intake);
     }
@@ -17,7 +17,7 @@ public class PullNote extends Command {
 
     @Override
     public void execute() {
-       intake.pullNote();
+       intake.stop();
     }
 
     @Override

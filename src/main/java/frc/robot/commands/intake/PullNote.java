@@ -1,12 +1,12 @@
-package frc.robot.commands;
+package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake;
 
-public class PushNote extends Command {
+public class PullNote extends Command {
     private final Intake intake;
     
-    public PushNote(Intake intake){
+    public PullNote(Intake intake){
         this.intake = intake;
         addRequirements(intake);
     }
@@ -17,7 +17,7 @@ public class PushNote extends Command {
 
     @Override
     public void execute() {
-       intake.pushNote();
+       intake.pullNote();
     }
 
     @Override
@@ -29,4 +29,5 @@ public class PushNote extends Command {
     public boolean isFinished() {
         return false;
     }
+    
 }

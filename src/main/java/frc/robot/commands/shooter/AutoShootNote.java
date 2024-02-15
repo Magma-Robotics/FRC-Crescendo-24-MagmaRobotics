@@ -1,14 +1,14 @@
-package frc.robot.commands;
+package frc.robot.commands.shooter;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
 
-public class StopIntake extends Command {
-     private final Intake intake;
-    
-    public StopIntake(Intake intake){
-        this.intake = intake;
-        addRequirements(intake);
+public class AutoShootNote extends Command{
+    private final Shooter shooter;
+
+    public AutoShootNote(Shooter shooter){
+        this.shooter = shooter;
+        addRequirements(shooter);
     }
     
     @Override
@@ -17,7 +17,7 @@ public class StopIntake extends Command {
 
     @Override
     public void execute() {
-       intake.stop();
+        shooter.autoShootNote();
     }
 
     @Override
