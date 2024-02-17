@@ -15,13 +15,13 @@ public class Shooter extends SubsystemBase{
     }
 
     public void shootNote() {
-        leftShooterMotor.set(1);
-        rightShooterMotor.set(-1);
+        leftShooterMotor.set(-0.8);
+        rightShooterMotor.set(0.8);
     }
 
     public void reverseShootNote() {
-        leftShooterMotor.set(-1);
-        rightShooterMotor.set(1);
+        leftShooterMotor.set(0.8);
+        rightShooterMotor.set(-0.8);
     }
 
     public void autoShootNote() {

@@ -14,11 +14,11 @@ public class Intake extends SubsystemBase{
     }
 
     public void pullNote() {
-        intakeMotor.set(1);
+        intakeMotor.set(0.5);
     }
 
     public void pushNote() {
-        intakeMotor.set(-1);
+        intakeMotor.set(-0.5);
     }
 
     

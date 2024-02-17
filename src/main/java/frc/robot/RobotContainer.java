@@ -5,10 +5,14 @@
 package frc.robot;
 
 import frc.robot.commands.Autos;
+import frc.robot.commands.drive.AutoMovement;
 import frc.robot.commands.drive.DriveTrainCommand;
 import frc.robot.commands.intake.PullNote;
 import frc.robot.commands.intake.PushNote;
 import frc.robot.commands.intake.StopIntake;
+import frc.robot.commands.lift.LowerLift;
+import frc.robot.commands.lift.RaiseLift;
+import frc.robot.commands.lift.StopLift;
 import frc.robot.commands.shooter.AutoShootNote;
 import frc.robot.commands.shooter.ReverseShootNote;
 import frc.robot.commands.shooter.ShootNote;
@@ -16,6 +20,7 @@ import frc.robot.commands.shooter.StopShooter;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.Shooter;
 
 import java.util.ArrayList;
@@ -32,6 +37,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -45,7 +51,9 @@ public class RobotContainer {
   private DriveTrain driveTrain = new DriveTrain();
   private Intake intake = new Intake();
   private Shooter shooter = new Shooter();
-  private JoystickButton buttonA, buttonB, buttonX, buttonY;
+  private Lift lift = new Lift();
+  private JoystickButton buttonA, buttonB, buttonX, buttonY, leftBumper, rightBumper, leftTrigger, rightTrigger;
+  private POVButton upPOV, downPOV, leftPOV, rightPOV;
   private final SendableChooser<Command> autoChooser;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -64,11 +72,18 @@ public class RobotContainer {
 
 
     //buttons
-    this.buttonA = new JoystickButton(driverController, Constants.Button.kA);
-    this.buttonB = new JoystickButton(driverController, Constants.Button.kB);
-    this.buttonX = new JoystickButton(driverController, Constants.Button.kX);
-    this.buttonY = new JoystickButton(driverController, Constants.Button.kY);
-
+    this.buttonA = new JoystickButton(driverController, XboxController.Button.kA.value);
+    this.buttonB = new JoystickButton(driverController, XboxController.Button.kB.value);
+    this.buttonX = new JoystickButton(driverPartnerController, XboxController.Button.kX.value);
+    this.buttonY = new JoystickButton(driverPartnerController, XboxController.Button.kY.value);
+    this.leftBumper = new JoystickButton(driverPartnerController, XboxController.Button.kLeftBumper.value);
+    this.rightBumper = new JoystickButton(driverPartnerController, XboxController.Button.kRightBumper.value);
+    this.leftTrigger = new JoystickButton(driverPartnerController, XboxController.Axis.kLeftTrigger.value);
+    this.rightTrigger = new JoystickButton(driverPartnerController, XboxController.Axis.kRightTrigger.value);
+    this.upPOV = new POVButton(driverPartnerController, Constants.POVButton.kUP);
+    this.downPOV = new POVButton(driverPartnerController, Constants.POVButton.kDOWN);
+    this.leftPOV = new POVButton(driverController, Constants.POVButton.kLEFT);
+    this.rightPOV = new POVButton(driverController, Constants.POVButton.kRIGHT);
 
     //default commands
     driveTrain.setDefaultCommand(new DriveTrainCommand(driveTrain, driverController));
@@ -91,10 +106,12 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    buttonA.onTrue(new PullNote(intake)).onFalse(new StopIntake(intake));
-    buttonB.onTrue(new PushNote(intake)).onFalse(new StopIntake(intake));
+    rightBumper.onTrue(new PullNote(intake)).onFalse(new StopIntake(intake));
+    leftBumper.onTrue(new PushNote(intake)).onFalse(new StopIntake(intake));
     buttonX.onTrue(new ShootNote(shooter)).onFalse(new StopShooter(shooter));
     buttonY.onTrue(new ReverseShootNote(shooter)).onFalse(new StopShooter(shooter));
+    upPOV.onTrue(new RaiseLift(lift)).onFalse(new StopLift(lift));
+    downPOV.onTrue(new LowerLift(lift)).onFalse(new StopLift(lift));
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
@@ -107,6 +124,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return autoChooser.getSelected();
+    return /*AutoMovement(driveTrain, 0, 0, 0);*/autoChooser.getSelected();
   }
 }
