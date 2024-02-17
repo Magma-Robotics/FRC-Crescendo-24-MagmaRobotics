@@ -44,6 +44,9 @@ public class DriveTrain extends SubsystemBase{
     private Field2d field = new Field2d();
 
     public DriveTrain() {
+        leftFront.restoreFactoryDefaults();
+        rightFront.restoreFactoryDefaults();
+
         leftFront.setInverted(false);
         rightFront.setInverted(false);
 
@@ -62,7 +65,7 @@ public class DriveTrain extends SubsystemBase{
         rightFront.burnFlash();
         rightBack.burnFlash();
         
-
+ 
         AutoBuilder.configureRamsete(
             this::getPose, //Robot pose supplier
             this::resetPose, //resets odometry
@@ -116,9 +119,9 @@ public class DriveTrain extends SubsystemBase{
     }
 
     public void diffDrive(double leftJoystick, double rightJoystick) {
-        diffDrive.tankDrive(-leftJoystick, rightJoystick);
+        diffDrive.tankDrive(-leftJoystick, -rightJoystick);
     }
-
+ 
     public Pose2d getPose() {
         return m_PoseEstimator.getEstimatedPosition();
     }
