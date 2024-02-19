@@ -21,6 +21,7 @@ import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Lift;
+import frc.robot.subsystems.NavX;
 import frc.robot.subsystems.Shooter;
 
 import java.util.ArrayList;
@@ -32,6 +33,8 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -52,6 +55,7 @@ public class RobotContainer {
   private Intake intake = new Intake();
   private Shooter shooter = new Shooter();
   private Lift lift = new Lift();
+  private NavX navx = new NavX();
   private JoystickButton buttonA, buttonB, buttonX, buttonY, leftBumper, rightBumper, leftTrigger, rightTrigger;
   private POVButton upPOV, downPOV, leftPOV, rightPOV;
   private final SendableChooser<Command> autoChooser;
@@ -86,12 +90,14 @@ public class RobotContainer {
     this.rightPOV = new POVButton(driverController, Constants.POVButton.kRIGHT);
 
     //default commands
-    driveTrain.setDefaultCommand(new DriveTrainCommand(driveTrain, driverController));
+    driveTrain.setDefaultCommand(new DriveTrainCommand(driveTrain, navx, driverController));
 
     //autoChooser for pathplanner
     autoChooser = AutoBuilder.buildAutoChooser();
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    buildShuffleboard();
     // Configure the trigger bindings
     configureBindings();
   }
@@ -125,5 +131,20 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     return /*AutoMovement(driveTrain, 0, 0, 0);*/autoChooser.getSelected();
+  }
+
+  private void buildShuffleboard() {
+    buildDriveTestTab();
+  }
+  
+  public void buildDriveTestTab() {
+    ShuffleboardTab driveMMTab = Shuffleboard.getTab("Drive Testing");
+    driveMMTab.add("kF", 0.1 )              .withPosition(0, 0).getEntry();
+    driveMMTab.add("kP", 0.3 )              .withPosition(1, 0).getEntry();
+    driveMMTab.add("kI", 0 )                .withPosition(2, 0).getEntry();
+    driveMMTab.add("kD", 0 )                .withPosition(3, 0).getEntry();
+    driveMMTab.add("Tgt. Inches", 0)        .withPosition(4, 0).getEntry();
+    driveMMTab.add("Tgt. Degrees", 0)       .withPosition(5, 0).getEntry();
+    driveMMTab.add("Finish Iterations", 5 ) .withPosition(6, 0).getEntry();
   }
 }

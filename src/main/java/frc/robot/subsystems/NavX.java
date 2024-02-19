@@ -13,7 +13,7 @@ public class NavX extends SubsystemBase {
 
     public NavX() {
         try {
-            this.navx = new AHRS(SerialPort.Port.kUSB);
+            this.navx = new AHRS(SerialPort.Port.kMXP);
         } catch (Exception e) {
             DriverStation.reportError("Error instantiating navX-MXP:  " + e.getMessage(), true);
         }

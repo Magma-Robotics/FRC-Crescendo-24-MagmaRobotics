@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Shooter extends SubsystemBase{
     private CANSparkMax leftShooterMotor = new CANSparkMax(6, MotorType.kBrushless);
@@ -15,13 +16,13 @@ public class Shooter extends SubsystemBase{
     }
 
     public void shootNote() {
-        leftShooterMotor.set(-0.8);
-        rightShooterMotor.set(0.8);
+        leftShooterMotor.set(-Constants.Shooter.SHOOTER_SPEED);
+        rightShooterMotor.set(Constants.Shooter.SHOOTER_SPEED);
     }
 
     public void reverseShootNote() {
-        leftShooterMotor.set(0.8);
-        rightShooterMotor.set(-0.8);
+        leftShooterMotor.set(Constants.Shooter.SHOOTER_SPEED);
+        rightShooterMotor.set(-Constants.Shooter.SHOOTER_SPEED);
     }
 
     public void autoShootNote() {

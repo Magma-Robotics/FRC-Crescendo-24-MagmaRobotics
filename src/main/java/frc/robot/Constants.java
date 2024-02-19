@@ -27,9 +27,14 @@ public final class Constants {
     public static final int kRIGHT = 270;
   }
 
+  public static class Shooter {
+    public static final double SHOOTER_SPEED = 0.5;
+  }
+
   public static class Drivetrain {
     public static final double WHEEL_DIAMETER_IN_METERS = Units.inchesToMeters(6);
     public static final double TRACK_WIDTH_IN_METERS = Units.inchesToMeters(22.5);
+    public static final double DRIVETRAIN_SPEED = 0.8;
 
     public static class LeftWheels {
       public static final double kP = 0;
