@@ -20,13 +20,6 @@ public final class Constants {
     public static final int kDriverPartnerControllerPort = 1;
   }
 
-  public static class POVButton {
-    public static final int kUP = 0;
-    public static final int kDOWN = 180;
-    public static final int kLEFT = 90;
-    public static final int kRIGHT = 270;
-  }
-
   public static class Shooter {
     public static final double SHOOTER_SPEED = 0.5;
   }

@@ -56,12 +56,10 @@ public class RobotContainer {
   private Shooter shooter = new Shooter();
   private Lift lift = new Lift();
   private NavX navx = new NavX();
-  private JoystickButton buttonA, buttonB, buttonX, buttonY, leftBumper, rightBumper, leftTrigger, rightTrigger;
-  private POVButton upPOV, downPOV, leftPOV, rightPOV;
   private final SendableChooser<Command> autoChooser;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private XboxController driverController, driverPartnerController;
+  private CommandXboxController driverController, driverPartnerController;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -71,23 +69,8 @@ public class RobotContainer {
     NamedCommands.registerCommands(namedCommands);
 
     //controllers
-    driverController = new XboxController(Constants.OperatorConstants.kDriverControllerPort);
-    driverPartnerController = new XboxController(Constants.OperatorConstants.kDriverPartnerControllerPort);
-
-
-    //buttons
-    this.buttonA = new JoystickButton(driverController, XboxController.Button.kA.value);
-    this.buttonB = new JoystickButton(driverController, XboxController.Button.kB.value);
-    this.buttonX = new JoystickButton(driverPartnerController, XboxController.Button.kX.value);
-    this.buttonY = new JoystickButton(driverPartnerController, XboxController.Button.kY.value);
-    this.leftBumper = new JoystickButton(driverPartnerController, XboxController.Button.kLeftBumper.value);
-    this.rightBumper = new JoystickButton(driverPartnerController, XboxController.Button.kRightBumper.value);
-    this.leftTrigger = new JoystickButton(driverPartnerController, XboxController.Axis.kLeftTrigger.value);
-    this.rightTrigger = new JoystickButton(driverPartnerController, XboxController.Axis.kRightTrigger.value);
-    this.upPOV = new POVButton(driverPartnerController, Constants.POVButton.kUP);
-    this.downPOV = new POVButton(driverPartnerController, Constants.POVButton.kDOWN);
-    this.leftPOV = new POVButton(driverController, Constants.POVButton.kLEFT);
-    this.rightPOV = new POVButton(driverController, Constants.POVButton.kRIGHT);
+    driverController = new CommandXboxController(Constants.OperatorConstants.kDriverControllerPort);
+    driverPartnerController = new CommandXboxController(Constants.OperatorConstants.kDriverPartnerControllerPort);
 
     //default commands
     driveTrain.setDefaultCommand(new DriveTrainCommand(driveTrain, navx, driverController));
@@ -112,12 +95,12 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    rightBumper.onTrue(new PullNote(intake)).onFalse(new StopIntake(intake));
-    leftBumper.onTrue(new PushNote(intake)).onFalse(new StopIntake(intake));
-    buttonX.onTrue(new ShootNote(shooter)).onFalse(new StopShooter(shooter));
-    buttonY.onTrue(new ReverseShootNote(shooter)).onFalse(new StopShooter(shooter));
-    upPOV.onTrue(new RaiseLift(lift)).onFalse(new StopLift(lift));
-    downPOV.onTrue(new LowerLift(lift)).onFalse(new StopLift(lift));
+    driverPartnerController.rightBumper().onTrue(new PullNote(intake)).onFalse(new StopIntake(intake));
+    driverPartnerController.leftBumper().onTrue(new PushNote(intake)).onFalse(new StopIntake(intake));
+    driverPartnerController.x().onTrue(new ShootNote(shooter)).onFalse(new StopShooter(shooter));
+    driverPartnerController.y().onTrue(new ReverseShootNote(shooter)).onFalse(new StopShooter(shooter));
+    driverPartnerController.povUp().onTrue(new RaiseLift(lift)).onFalse(new StopLift(lift));
+    driverPartnerController.povDown().onTrue(new LowerLift(lift)).onFalse(new StopLift(lift));
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
