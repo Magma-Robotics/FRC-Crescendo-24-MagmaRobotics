@@ -4,8 +4,20 @@
 
 package frc.robot;
 
-import frc.robot.commands.Autos;
-import frc.robot.commands.drive.AutoMovement;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+
+import edu.wpi.first.math.Pair;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.drive.DriveTrainCommand;
 import frc.robot.commands.intake.PullNote;
 import frc.robot.commands.intake.PushNote;
@@ -18,30 +30,10 @@ import frc.robot.commands.shooter.ReverseShootNote;
 import frc.robot.commands.shooter.ShootNote;
 import frc.robot.commands.shooter.StopShooter;
 import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Lift;
 import frc.robot.subsystems.NavX;
 import frc.robot.subsystems.Shooter;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-
-import edu.wpi.first.math.Pair;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -65,7 +57,7 @@ public class RobotContainer {
   public RobotContainer() {
     //Register named commands
     List<Pair<String, Command>> namedCommands = new ArrayList<Pair<String, Command>>();
-    namedCommands.add(new Pair<String,Command>("autoShootNote", new AutoShootNote(shooter)));
+    namedCommands.add(new Pair<String,Command>("autoShootNote", new AutoShootNote(shooter, intake)));
     NamedCommands.registerCommands(namedCommands);
 
     //controllers
@@ -113,7 +105,10 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return /*AutoMovement(driveTrain, 0, 0, 0);*/autoChooser.getSelected();
+    
+    return 
+      new AutoShootNote(shooter, intake);
+    //autoChooser.getSelected();
   }
 
   private void buildShuffleboard() {
@@ -129,5 +124,32 @@ public class RobotContainer {
     driveMMTab.add("Tgt. Inches", 0)        .withPosition(4, 0).getEntry();
     driveMMTab.add("Tgt. Degrees", 0)       .withPosition(5, 0).getEntry();
     driveMMTab.add("Finish Iterations", 5 ) .withPosition(6, 0).getEntry();
+/*
+    // Result Values on row 2
+    driveMMTab.add("Tgt. Ticks", 0)                                          .withPosition(0, 1);
+    driveMMTab.addNumber("Left Encoder", driveTrain::getLeftEncoderPos)                   .withPosition(1, 1);
+    driveMMTab.addNumber("Right Encoder", driveTrain::getRightEncoderPos)                 .withPosition(2, 1);
+    driveMMTab.addNumber("Gyro Read", navx::getYaw)                                       .withPosition(3, 1);
+    driveMMTab.add("Run Time", 0)                                            .withPosition(4, 1);
+    driveMMTab.addNumber("Left SP", m_driveTrain::getLeftSetPoint).withPosition(5, 1).withSize(1, 1);
+    driveMMTab.addNumber("Right SP", m_driveTrain::getRightSetPoint).withPosition(6, 1).withSize(1, 1);
+   
+    // Drive limiters on row 3
+    driveMMTab.add("Forward Limiter", 2.5).withPosition(0, 2);
+    driveMMTab.add("Rotation Limiter", 2.5).withPosition(1, 2);
+    driveMMTab.add("Drive Max", .7).withPosition(2, 2);
+    driveMMTab.add("Update Limits", new UpdateDriveLimiters(driveTrain)).withPosition(3, 2).withSize(2, 1);
+
+    // Drive commands on row 4
+    driveMMTab.add("Drive MM 100", new DriveMM(driveTrain, 100))        .withPosition(0, 3).withSize(2, 1);
+    driveMMTab.add("Drive MM -100", new DriveMM(driveTrain, -100))      .withPosition(2, 3).withSize(2, 1);
+    //driveMMTab.add("Drive MM Test", new DriveMMTest(driveTrain, 0))     .withPosition(4, 3).withSize(2, 1);
+
+    // Turn commands on row 5
+    driveMMTab.add("Turn MM 90", new TurnToAngle(driveTrain, 90))          .withPosition(0, 4).withSize(2, 1);
+    driveMMTab.add("Turn MM -90", new TurnToAngle(driveTrain, -90))        .withPosition(2, 4).withSize(2, 1);
+    driveMMTab.add("Turn MM Test", new TurnToAngleTest(driveTrain, 0))     .withPosition(4, 4).withSize(2, 1);
+    */
+  }
   }
 }

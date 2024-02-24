@@ -6,7 +6,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Lift extends SubsystemBase {
-    private CANSparkMax lift = new CANSparkMax(8, MotorType.kBrushless);
+    private CANSparkMax lift = new CANSparkMax(13, MotorType.kBrushless);
 
     public Lift() {
         lift.restoreFactoryDefaults();
