@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -14,17 +15,21 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelPositions;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class DriveTrain extends SubsystemBase{
-    private NavX navx = new NavX();
+    private AHRS navx = new AHRS(SPI.Port.kMXP);
+    private final DifferentialDriveOdometry m_odometry;
 
     private CANSparkMax leftFront = new CANSparkMax(1, MotorType.kBrushless);
     private CANSparkMax leftBack = new CANSparkMax(2, MotorType.kBrushless);
@@ -35,12 +40,10 @@ public class DriveTrain extends SubsystemBase{
     public RelativeEncoder leftDriveEncoder = leftFront.getEncoder();
     private RelativeEncoder rightDriveEncoder = rightFront.getEncoder();
 
-    private final double wheelDiameter = Constants.Drivetrain.WHEEL_DIAMETER_IN_METERS;
-    private final double trackWidth = Constants.Drivetrain.TRACK_WIDTH_IN_METERS;
+    private DifferentialDriveKinematics m_kinematics = Constants.Drivetrain.kDriveKinematics;
 
-    private PIDController leftWheelsController = new PIDController(Constants.Drivetrain.LeftWheels.kP, Constants.Drivetrain.LeftWheels.kI, Constants.Drivetrain.LeftWheels.kD); 
-    private PIDController rightWheelsController = new PIDController(Constants.Drivetrain.RightWheels.kP, Constants.Drivetrain.RightWheels.kI, Constants.Drivetrain.RightWheels.kD);
-
+    //private PIDController wheelController = new PIDController(Constants.Drivetrain.kPDriveVel); 
+    
     private Field2d field = new Field2d();
 
     public DriveTrain() {
@@ -57,11 +60,17 @@ public class DriveTrain extends SubsystemBase{
 
 
         //records encoders in terms of meters, 8.46:1 gear ratio
-        leftDriveEncoder.setPositionConversionFactor((wheelDiameter * Math.PI) / (8.46));
+        leftDriveEncoder.setPositionConversionFactor(Constants.Drivetrain.kLinearDistanceConversionFactor);
+        rightDriveEncoder.setPositionConversionFactor(Constants.Drivetrain.kLinearDistanceConversionFactor);
+
+        leftDriveEncoder.setVelocityConversionFactor(Constants.Drivetrain.kLinearDistanceConversionFactor / 60);
+        rightDriveEncoder.setVelocityConversionFactor(Constants.Drivetrain.kLinearDistanceConversionFactor / 60);
+
+        /*leftDriveEncoder.setPositionConversionFactor((wheelDiameter * Math.PI) / (8.46));
         rightDriveEncoder.setPositionConversionFactor((wheelDiameter * Math.PI) / (8.46));
 
         leftDriveEncoder.setVelocityConversionFactor((wheelDiameter * Math.PI) / (8.46 * 60));
-        rightDriveEncoder.setVelocityConversionFactor((wheelDiameter * Math.PI) / (8.46 * 60));
+        rightDriveEncoder.setVelocityConversionFactor((wheelDiameter * Math.PI) / (8.46 * 60));*/
 
         leftFront.burnFlash();
         leftBack.burnFlash();
@@ -113,6 +122,11 @@ public class DriveTrain extends SubsystemBase{
         PathPlannerLogging.setLogActivePathCallback((poses) -> field.getObject("path").setPoses(poses));
 
         SmartDashboard.putData("Field", field);
+
+        navx.reset();
+        resetEncoders();
+
+        m_odometry = new DifferentialDriveOdometry(navx.getRotation2d(), leftDriveEncoder.getPosition(), rightDriveEncoder.getPosition());
     }
 
     //public LTVDifferentialDriveController ltvController = new LTVDifferentialDriveController(null, trackWidth, null, null, trackWidth);
@@ -124,24 +138,27 @@ public class DriveTrain extends SubsystemBase{
     public void diffDrive(double leftJoystick, double rightJoystick) {
         diffDrive.tankDrive(-leftJoystick, -rightJoystick);
     }
+
+    public void resetEncoders() {
+        leftDriveEncoder.setPosition(0);
+        rightDriveEncoder.setPosition(0);
+    }
  
     public Pose2d getPose() {
         return m_PoseEstimator.getEstimatedPosition();
     }
 
     public void resetPose(Pose2d pose) {
-        m_PoseEstimator.resetPosition(getRotation2d(), wheelPositions, pose);
+        m_PoseEstimator.resetPosition(navx.getRotation2d(), wheelPositions, pose);
     }
     
     private DifferentialDriveWheelPositions wheelPositions = new DifferentialDriveWheelPositions(leftDriveEncoder.getPosition(), rightDriveEncoder.getPosition()); //encoder ticks in meters
    
-    private final DifferentialDriveKinematics m_kinematics = 
-        new DifferentialDriveKinematics(trackWidth); //track width
     
     private final DifferentialDrivePoseEstimator m_PoseEstimator =
         new DifferentialDrivePoseEstimator(
             m_kinematics, //track width
-            getRotation2d(),
+            navx.getRotation2d(),
             wheelPositions.leftMeters, //encoders
             wheelPositions.rightMeters, 
             new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
@@ -154,10 +171,6 @@ public class DriveTrain extends SubsystemBase{
 
     private ChassisSpeeds chassisSpeeds = m_kinematics.toChassisSpeeds(wheelSpeeds);
 
-    public Rotation2d getRotation2d() {
-        return navx.getRotation2d();
-    }
-
     public double getLeftEncoderPos() {
         return leftDriveEncoder.getPosition();
     }
@@ -169,5 +182,10 @@ public class DriveTrain extends SubsystemBase{
     }
     public double getRightEncoderVel() {
         return rightDriveEncoder.getVelocity();
+    }
+
+    @Override
+    public void periodic() {
+        m_odometry.update(navx.getRotation2d(), leftDriveEncoder.getPosition(), rightDriveEncoder.getPosition());
     }
 }

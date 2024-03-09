@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -25,20 +26,27 @@ public final class Constants {
   }
 
   public static class Drivetrain {
-    public static final double WHEEL_DIAMETER_IN_METERS = Units.inchesToMeters(6);
-    public static final double TRACK_WIDTH_IN_METERS = Units.inchesToMeters(22.5);
+    public static final double ksVolts = 0;
+    public static final double ksVoltSecondsPerMeter = 0;
+    public static final double kaVoltSecondsSquaredPerMeter = 0;
+    public static final double kPDriveVel = 0;
+  
+    public static final double kTrackWidthMeters = Units.inchesToMeters(22.5);
+    public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(kTrackWidthMeters);
+
+    public static final double kMaxSpeedMetersPerSecond = 3;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+
+    public static final double kRamseteB = 2;
+    public static final double kRamseteZeta = 0.7;
+
+    public static final double kGearRatio = 8.46;
+    public static final double kWheelRadiusMeters = Units.inchesToMeters(3);
+
+    public static final double kLinearDistanceConversionFactor = (Units.inchesToMeters(1 / (kGearRatio * 2 * Math.PI * kWheelRadiusMeters) * 10));
+
     public static final double DRIVETRAIN_SPEED = 0.8;
 
-    public static class LeftWheels {
-      public static final double kP = 0;
-      public static final double kI = 0;
-      public static final double kD = 0;
-    }
-
-    public static class RightWheels {
-      public static final double kP = 0;
-      public static final double kI = 0;
-      public static final double kD = 0;
-    }
+    
   }
 }
