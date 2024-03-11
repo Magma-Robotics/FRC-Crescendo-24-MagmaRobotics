@@ -42,7 +42,8 @@ public class DriveTrain extends SubsystemBase{
 
     private DifferentialDriveKinematics m_kinematics = Constants.Drivetrain.kDriveKinematics;
 
-    //private PIDController wheelController = new PIDController(Constants.Drivetrain.kPDriveVel); 
+    private PIDController leftWheelsController = new PIDController(Constants.Drivetrain.kPDriveVel, 0, 0); 
+    private PIDController rightWheelsController = new PIDController(Constants.Drivetrain.kPDriveVel, 0, 0);
     
     private Field2d field = new Field2d();
 
@@ -127,12 +128,28 @@ public class DriveTrain extends SubsystemBase{
         resetEncoders();
 
         m_odometry = new DifferentialDriveOdometry(navx.getRotation2d(), leftDriveEncoder.getPosition(), rightDriveEncoder.getPosition());
+        m_PoseEstimator.resetPosition(null, wheelPositions, getPose());
     }
 
     //public LTVDifferentialDriveController ltvController = new LTVDifferentialDriveController(null, trackWidth, null, null, trackWidth);
 
     public void stop() {
         diffDrive.stopMotor();
+    }
+
+    public void testMotorForward() {
+        leftFront.set(1);
+        rightFront.set(1);
+    }
+
+    public void testMotorBackward() {
+        leftFront.set(-1);
+        rightFront.set(-1);
+    }
+
+    public void stopDriveMotors() {
+        leftFront.stopMotor();
+        rightFront.stopMotor();
     }
 
     public void diffDrive(double leftJoystick, double rightJoystick) {

@@ -19,6 +19,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.drive.DriveTrainCommand;
+import frc.robot.commands.drive.StopDriveMotors;
+import frc.robot.commands.drive.TestMotorBackward;
+import frc.robot.commands.drive.TestMotorForward;
 import frc.robot.commands.intake.PullNote;
 import frc.robot.commands.intake.PushNote;
 import frc.robot.commands.intake.StopIntake;
@@ -93,6 +96,9 @@ public class RobotContainer {
     driverPartnerController.y().onTrue(new ReverseShootNote(shooter)).onFalse(new StopShooter(shooter));
     driverPartnerController.povUp().onTrue(new RaiseLift(lift)).onFalse(new StopLift(lift));
     driverPartnerController.povDown().onTrue(new LowerLift(lift)).onFalse(new StopLift(lift));
+
+    driverController.povUp().onTrue(new TestMotorForward(driveTrain)).onFalse(new StopDriveMotors(driveTrain));
+    driverController.povUp().onTrue(new TestMotorBackward(driveTrain)).onFalse(new StopDriveMotors(driveTrain));
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
