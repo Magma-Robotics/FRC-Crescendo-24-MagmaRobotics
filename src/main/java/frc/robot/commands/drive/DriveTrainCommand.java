@@ -34,11 +34,11 @@ public class DriveTrainCommand extends Command {
             driveController.getRightY()*Constants.Drivetrain.DRIVETRAIN_SPEED
             );
 
-        SmartDashboard.putNumber("leftEncoderPos", driveTrain.getLeftEncoderPos());//*(-(Units.inchesToMeters(6) * Math.PI) / (8.46*42)));
+        /*SmartDashboard.putNumber("leftEncoderPos", driveTrain.getLeftEncoderPos());//*(-(Units.inchesToMeters(6) * Math.PI) / (8.46*42)));
         SmartDashboard.putNumber("leftEncoderVel", driveTrain.getLeftEncoderVel());//*(-(Units.inchesToMeters(6) * Math.PI) / (8.46)*42 * 60));
         SmartDashboard.putNumber("rightEncoderPos", driveTrain.getRightEncoderPos());//*(-(Units.inchesToMeters(6) * Math.PI) / (8.46*42)));
         SmartDashboard.putNumber("rightEncoderVel", driveTrain.getRightEncoderVel());//*(-(Units.inchesToMeters(6) * Math.PI) / (8.46*42 * 60)));
-        SmartDashboard.putNumber("yaw", navx.getYaw());
+        SmartDashboard.putNumber("yaw", navx.getYaw());*/
         
     }
 

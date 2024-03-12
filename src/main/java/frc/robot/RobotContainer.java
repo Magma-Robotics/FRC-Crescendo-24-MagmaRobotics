@@ -51,7 +51,7 @@ public class RobotContainer {
   private Shooter shooter = new Shooter();
   private Lift lift = new Lift();
   private NavX navx = new NavX();
-  private final SendableChooser<Command> autoChooser;
+  //private final SendableChooser<Command> autoChooser;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private CommandXboxController driverController, driverPartnerController;
@@ -71,10 +71,10 @@ public class RobotContainer {
     driveTrain.setDefaultCommand(new DriveTrainCommand(driveTrain, navx, driverController));
 
     //autoChooser for pathplanner
-    autoChooser = AutoBuilder.buildAutoChooser();
+    /*autoChooser = AutoBuilder.buildAutoChooser();
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
-
+*/
     buildShuffleboard();
     // Configure the trigger bindings
     configureBindings();
@@ -98,7 +98,7 @@ public class RobotContainer {
     driverPartnerController.povDown().onTrue(new LowerLift(lift)).onFalse(new StopLift(lift));
 
     driverController.povUp().onTrue(new TestMotorForward(driveTrain)).onFalse(new StopDriveMotors(driveTrain));
-    driverController.povUp().onTrue(new TestMotorBackward(driveTrain)).onFalse(new StopDriveMotors(driveTrain));
+    driverController.povDown().onTrue(new TestMotorBackward(driveTrain)).onFalse(new StopDriveMotors(driveTrain));
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.

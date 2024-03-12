@@ -10,6 +10,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.LTVDifferentialDriveController;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,7 +25,9 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 
 public class DriveTrain extends SubsystemBase{
@@ -44,8 +47,13 @@ public class DriveTrain extends SubsystemBase{
 
     private PIDController leftWheelsController = new PIDController(Constants.Drivetrain.kPDriveVel, 0, 0); 
     private PIDController rightWheelsController = new PIDController(Constants.Drivetrain.kPDriveVel, 0, 0);
-    
+
+    private SimpleMotorFeedforward leftWheelFeedforward = new SimpleMotorFeedforward(Constants.Drivetrain.ksVolts, Constants.Drivetrain.ksVoltSecondsPerMeter, Constants.Drivetrain.kaVoltSecondsSquaredPerMeter);
+    private SimpleMotorFeedforward rightWheelFeedforward = new SimpleMotorFeedforward(Constants.Drivetrain.ksVolts, Constants.Drivetrain.ksVoltSecondsPerMeter, Constants.Drivetrain.kaVoltSecondsSquaredPerMeter)
+
     private Field2d field = new Field2d();
+
+    private SysIdRoutine routine;
 
     public DriveTrain() {
         leftFront.restoreFactoryDefaults();
@@ -78,6 +86,18 @@ public class DriveTrain extends SubsystemBase{
         rightFront.burnFlash();
         rightBack.burnFlash();
         
+        /*SysIdRoutine routine = new SysIdRoutine(
+            new SysIdRoutine.Config(),
+            new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
+                leftFront.setVoltage(volts.in(Voltage));
+                rightFront.setVoltage(volts.in(Voltage));}, 
+            log -> {
+                log.motor("drive-left")
+                    .voltage(
+                        m_appliedVoltage.mut_replace
+                    )
+            }, 
+            this));*/
  
         /*AutoBuilder.configureRamsete(
             this::getPose, //Robot pose supplier
@@ -104,9 +124,7 @@ public class DriveTrain extends SubsystemBase{
             this::resetPose, 
             this::getSpeeds, 
             (chassisSpeeds) -> {
-                DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(chassisSpeeds);
-                this.diffDrive(leftWheelsController.calculate(leftDriveEncoder.getVelocity(), wheelSpeeds.leftMetersPerSecond), 
-                    rightWheelsController.calculate(rightDriveEncoder.getVelocity(), wheelSpeeds.rightMetersPerSecond));
+                driveConsumer(chassisSpeeds);
                 }, 
             0.02, 
             new ReplanningConfig(), 
@@ -133,18 +151,25 @@ public class DriveTrain extends SubsystemBase{
 
     //public LTVDifferentialDriveController ltvController = new LTVDifferentialDriveController(null, trackWidth, null, null, trackWidth);
 
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        return routine.quasistatic(direction);
+    }
+
+    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return routine.dynamic(direction);
+    }
+
     public void stop() {
         diffDrive.stopMotor();
     }
 
     public void testMotorForward() {
-        leftFront.set(1);
-        rightFront.set(1);
-    }
+        leftFront.set(0);
+        rightFront.set(0);
 
     public void testMotorBackward() {
-        leftFront.set(-1);
-        rightFront.set(-1);
+        leftFront.set(-0);
+        rightFront.set(-0);
     }
 
     public void stopDriveMotors() {
@@ -154,6 +179,12 @@ public class DriveTrain extends SubsystemBase{
 
     public void diffDrive(double leftJoystick, double rightJoystick) {
         diffDrive.tankDrive(-leftJoystick, -rightJoystick);
+    }
+
+    public void driveConsumer(ChassisSpeeds chassisSpeeds) {
+        DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(chassisSpeeds);
+        leftFront.setVoltage(leftWheelFeedforward.calculate(leftDriveEncoder.getVelocity(), wheelSpeeds.leftMetersPerSecond, 0.02));
+        rightFront.setVoltage(rightWheelFeedforward.calculate(rightDriveEncoder.getVelocity(), wheelSpeeds.rightMetersPerSecond, 0.02));
     }
 
     public void resetEncoders() {
