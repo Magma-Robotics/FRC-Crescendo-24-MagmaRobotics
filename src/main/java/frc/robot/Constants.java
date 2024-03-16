@@ -43,7 +43,7 @@ public final class Constants {
     public static final double kGearRatio = 8.46;
     public static final double kWheelRadiusMeters = Units.inchesToMeters(3);
 
-    public static final double kLinearDistanceConversionFactor = (Units.inchesToMeters(1 / (kGearRatio * 2 * Math.PI * kWheelRadiusMeters) * 10));
+    public static final double kLinearDistanceConversionFactor = 0.12;//(Units.inchesToMeters(1 / (kGearRatio * 2 * Math.PI * kWheelRadiusMeters) * 10));
 
     public static final double DRIVETRAIN_SPEED = 0.8;
 

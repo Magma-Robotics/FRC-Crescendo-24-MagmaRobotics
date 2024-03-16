@@ -23,7 +23,7 @@ public class AutoMovement extends Command {
 
     @Override
     public void execute() {
-        driveTrain.diffDrive(leftPower, rightPower);
+        driveTrain.diffDriveJoystick(leftPower, rightPower);
     }
 
     @Override

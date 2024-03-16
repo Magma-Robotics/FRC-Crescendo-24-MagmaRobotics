@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.drive.DriveEncoders;
 import frc.robot.commands.drive.DriveTrainCommand;
 import frc.robot.commands.drive.StopDriveMotors;
 import frc.robot.commands.drive.TestMotorBackward;
@@ -112,16 +113,15 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     
-    return 
-      new AutoShootNote(shooter, intake);
+    return new DriveEncoders(driveTrain, 0, 0);
     //autoChooser.getSelected();
   }
 
   private void buildShuffleboard() {
-    buildDriveTestTab();
+    //buildDriveTestTab();
   }
   
-  public void buildDriveTestTab() {
+  /*public void buildDriveTestTab() {
     ShuffleboardTab driveMMTab = Shuffleboard.getTab("Drive Testing");
     driveMMTab.add("kF", 0.1 )              .withPosition(0, 0).getEntry();
     driveMMTab.add("kP", 0.3 )              .withPosition(1, 0).getEntry();
@@ -130,7 +130,7 @@ public class RobotContainer {
     driveMMTab.add("Tgt. Inches", 0)        .withPosition(4, 0).getEntry();
     driveMMTab.add("Tgt. Degrees", 0)       .withPosition(5, 0).getEntry();
     driveMMTab.add("Finish Iterations", 5 ) .withPosition(6, 0).getEntry();
-/*
+
     // Result Values on row 2
     driveMMTab.add("Tgt. Ticks", 0)                                          .withPosition(0, 1);
     driveMMTab.addNumber("Left Encoder", driveTrain::getLeftEncoderPos)                   .withPosition(1, 1);
@@ -155,6 +155,6 @@ public class RobotContainer {
     driveMMTab.add("Turn MM 90", new TurnToAngle(driveTrain, 90))          .withPosition(0, 4).withSize(2, 1);
     driveMMTab.add("Turn MM -90", new TurnToAngle(driveTrain, -90))        .withPosition(2, 4).withSize(2, 1);
     driveMMTab.add("Turn MM Test", new TurnToAngleTest(driveTrain, 0))     .withPosition(4, 4).withSize(2, 1);
-    */
-  }
+    
+  }*/
 }

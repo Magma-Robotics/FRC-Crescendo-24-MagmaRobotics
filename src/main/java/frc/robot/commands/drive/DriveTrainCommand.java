@@ -29,7 +29,7 @@ public class DriveTrainCommand extends Command {
 
     @Override
     public void execute() {
-        this.driveTrain.diffDrive(
+        this.driveTrain.diffDriveJoystick(
             driveController.getLeftY()*Constants.Drivetrain.DRIVETRAIN_SPEED, 
             driveController.getRightY()*Constants.Drivetrain.DRIVETRAIN_SPEED
             );
