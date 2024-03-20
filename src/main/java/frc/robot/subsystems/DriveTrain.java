@@ -1,5 +1,10 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.MutableMeasure.mutable;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -20,6 +25,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelPositions;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
@@ -36,7 +42,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 
 public class DriveTrain extends SubsystemBase{
-    private AHRS navx = new AHRS(SPI.Port.kMXP);
+    //private AHRS navx = new AHRS(SPI.Port.kMXP);
     //private final DifferentialDriveOdometry m_odometry;
 
     private CANSparkMax leftFront = new CANSparkMax(1, MotorType.kBrushless);
@@ -58,22 +64,33 @@ public class DriveTrain extends SubsystemBase{
 
     private Field2d field = new Field2d();
 
-    /*private final MutableMeasure<Voltage> m_appliedVoltage = ; 
-    private final MutableMeasure<Distance> m_distance = ;
-    private final MutableMeasure<Velocity<Distance>> m_velocity = ;
+    private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0)); 
+    private final MutableMeasure<Distance> m_distance = mutable(Meters.of(0));
+    private final MutableMeasure<Velocity<Distance>> m_velocity = mutable(MetersPerSecond.of(0));
             
     private SysIdRoutine routine = new SysIdRoutine(
         new SysIdRoutine.Config(),
         new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
-            leftFront.setVoltage(volts.in(Voltage));
-            rightFront.setVoltage(volts.in(Voltage));}, 
+            leftFront.setVoltage(volts.in(Volts));
+            rightFront.setVoltage(volts.in(Volts));
+        }, 
         log -> {
             log.motor("drive-left")
                 .voltage(
                     m_appliedVoltage.mut_replace(
-                        leftFront.get() * RobotController.getBatteryVoltage(), Voltage)).linearPosition()
-        }, 
-        this));*/
+                        leftFront.get() * RobotController.getBatteryVoltage(), Volts))
+                    .linearPosition(m_distance.mut_replace(leftDriveEncoder.getPosition(), Meters))
+                    .linearVelocity(
+                        m_velocity.mut_replace(leftDriveEncoder.getVelocity(), MetersPerSecond));
+            log.motor("drive-right")
+                    .voltage(
+                        m_appliedVoltage.mut_replace(
+                            rightFront.get() * RobotController.getBatteryVoltage(), Volts))
+                    .linearPosition(m_distance.mut_replace(rightDriveEncoder.getPosition(), Meters))
+                    .linearVelocity(
+                        m_velocity.mut_replace(rightDriveEncoder.getVelocity(), MetersPerSecond));
+              },
+        this));
 
 
     public DriveTrain() {
@@ -159,13 +176,13 @@ public class DriveTrain extends SubsystemBase{
 
     //public LTVDifferentialDriveController ltvController = new LTVDifferentialDriveController(null, trackWidth, null, null, trackWidth);
 
-    /*public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
         return routine.quasistatic(direction);
     }
 
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
         return routine.dynamic(direction);
-    }*/
+    }
 
     public void stop() {
         diffDrive.stopMotor();

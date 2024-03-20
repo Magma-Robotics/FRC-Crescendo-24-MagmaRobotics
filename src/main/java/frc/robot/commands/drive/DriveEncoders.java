@@ -13,7 +13,6 @@ public class DriveEncoders extends Command {
     private double endDistance;
 
     public DriveEncoders(DriveTrain driveTrain, double speed, double userFeet) {
-        driveTrain.resetEncoders();
         driveDistance = userFeet;
         botSpeed = speed;
         addRequirements(driveTrain);
@@ -21,7 +20,9 @@ public class DriveEncoders extends Command {
 
     @Override
     public void initialize() {
-      endDistance = driveTrain.getLeftEncoderPos() + Units.feetToMeters(driveDistance);
+      endDistance = 0;
+      driveTrain.resetEncoders();
+      endDistance = driveTrain.getLeftEncoderPos() + driveDistance;
     }
     @Override
     public void execute() {

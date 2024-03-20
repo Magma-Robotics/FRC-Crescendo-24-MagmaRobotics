@@ -12,12 +12,10 @@ import frc.robot.subsystems.NavX;
 public class DriveTrainCommand extends Command {
 
     private final DriveTrain driveTrain;
-    private final NavX navx;
     private final CommandXboxController driveController;
 
-    public DriveTrainCommand(DriveTrain driveTrain, NavX navx, CommandXboxController driveController){
+    public DriveTrainCommand(DriveTrain driveTrain, CommandXboxController driveController){
         this.driveTrain = driveTrain;
-        this.navx = navx;
         this.driveController = driveController;
         driveController = new CommandXboxController(Constants.OperatorConstants.kDriverControllerPort);
         addRequirements(driveTrain);
